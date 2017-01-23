@@ -1,0 +1,42 @@
+.cal_item {
+	height: 140px;
+}
+
+.cal_item:hover {
+	background-color: #caeecf;
+	cursor: pointer;
+}
+
+
+.form-horizontal .controls {
+	margin-left: 60px;
+}
+
+.red .td {
+	color: #f14d30;
+}
+
+.red {
+	color: #f14d30;
+}
+
+.blue .td {
+	color: #288bdc;
+}
+
+.blue {
+	color: #288bdc;
+}
+
+.scheme_table td,.scheme_table th {
+	padding: 5px 5px 5px 5px;
+	text-align: center;
+}
+
+.leave_row_table td {
+	vertical-align: middle;
+}
+
+.form .form-body {
+	padding: 5px;
+}

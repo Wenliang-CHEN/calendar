@@ -1,0 +1,158 @@
+<script type="text/javascript" src='./lib/angular/angular.min.js'></script>
+<script type="text/javascript" src='./lib/angular/ui-bootstrap-tpls-0.2.0.js'></script>
+<script type="text/javascript" src='./src/configs/constant.js'></script>
+<script>
+ var CalendarApp = angular.module("CalendarApp", [
+    	'ui.bootstrap',
+]);
+
+</script>
+<script type="text/javascript" src='./src/services/dataService.js'></script>
+<script type="text/javascript" src='./src/services/calendarService.js'></script>
+<script type="text/javascript" src='./src/controllers/calendarController.js'></script>
+
+<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="./css/components-md.min.css" />
+<link rel="stylesheet" type="text/css" href="./css/style.css" />
+<link rel="stylesheet" type="text/css" href="./css/layout.min.css" />
+<link rel="stylesheet" type="text/css" href="./css/custom.min.css" />
+<link rel="stylesheet" type="text/css" href="./css/site.css" />
+
+<div ng-app="CalendarApp" ng-controller="CalendarContorller">
+
+	<div class="page-container">
+		<div class='page-content'>
+			<div class='container-fluid'>
+				<div class='page-content-inner'>
+					<div class='row'>
+						<div class='col-sm-12'>
+							<div class="portlet light form-fit row">
+								<div class="portlet-body form">
+									<div class="form-body">
+										<h2 style="margin-left: 20px">Event Calendar</h2>
+
+										<div class='col-sm-4'>
+										<form class="form-bordered form-horizontal" >
+										<div class="form-group">
+											<label class="col-sm-4 control-label" >Year </label>
+
+											<div class="col-sm-8">
+												<select ng-change='onParamChange()' class="form-control" ng-model='year' ng-options='item for item in yearList'></select>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label class="col-sm-4 control-label" >Month </label>
+
+											<div class="col-sm-8">
+												<select ng-change='onParamChange()' class="form-control" ng-model='month' ng-options='item for item in monthList'></select>
+											</div>
+										</div>
+										</form>
+										</div>
+										
+										<div class='col-sm-4'></div>
+										
+										<div class='col-sm-4'>
+											<table class="table table-bordered pull-right scheme_table">
+												<thead>
+													<tr>
+														<th colspan="2">Color Scheme</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<th>Priority</th>
+														<td class="red">Red</td>
+													</tr>
+													<tr>
+														<th>Normal</th>
+														<td class="blue">Blue</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										
+										<div class='col-sm-12'> 
+											<div class="leave_content">
+												<table class="table table-bordered">
+													<thead>
+														<tr>
+															<th colspan="7" style="text-align: center;">{{year}} - {{getMonthDisplay(month)}}</th>
+														</tr>
+														<tr>
+															<th style="width:14.2%" ng-repeat='columnName in calendarColumns'>{{columnName}}</th>
+														</tr>
+													</thead>
+													<tbody>														
+
+													<tr ng-repeat='row in events'>
+													
+														<td class='cal_item' ng-repeat='dayEventObj in row'>
+															<div ng-if='dayEventObj.valid'>
+																<b>{{printDay(dayEventObj.timestamp)}}</b>
+																
+																<div style="width:100%;">
+																	<span ng-repeat='event in dayEventObj.events'>{{event.name}}</span>
+																</div>
+																
+															</div>
+														</td>
+														
+													</tr>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<br />
+
+
+
+<!-- Leave Detail modal -->
+  <div class="modal" id="calenderDetailModal" style='width: 65%; left: 39%;'>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          	<a class="close" data-dismiss="modal">&times;</a>
+			<h3>
+				Event Detail for {{selectedDate}}
+			</h3>
+        </div>
+        <div class="modal-body leaveDetailContainer">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn default" data-dismiss='modal'>Cancel</button>
+          <button type="button" class="btn blue" ng-click='btnSaveTempRecords()'>Save Events</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- End Leave Detail modal -->
+
+<!-- block modal -->
+  <div class="modal" id="blockModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body leaveDetailContainer">
+          	<h4>
+				<img src="./images/ajax-load.gif" /> Processing,
+				please wait...
+			</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- End blocking modal -->
