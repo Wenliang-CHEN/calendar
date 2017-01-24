@@ -1,5 +1,6 @@
 
-CalendarApp.controller("CalendarContorller", ['$scope', '$http', 'DataService', 'CalendarService', function ($scope, $http, DataService, CalendarService) {
+CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'DataService', 'CalendarService', 'ModalService',
+	function ($scope, $http, $document, DataService, CalendarService, ModalService) {
 	//Init
 	$scope.yearList = [];
 	$scope.monthList = [];
@@ -55,4 +56,42 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', 'DataService', 
 	$scope.getMonthDisplay = function(month){
 		return CalendarService.getShortMonthText(month);
 	}
+
+
+	$scope.showDetail = function(eventDayObj) {
+        ModalService.showModal({
+            templateUrl: 'calenderDetailModal.html',
+            controller: "ModalController",
+			inputs: {
+				eventDayObj: eventDayObj,
+			},
+			scope: $scope
+        }).then(function(modal) {
+			
+            modal.element.modal();
+			
+            modal.close.then(function(eventDayObj) {
+                console.log(eventDayObj)
+				angular.element($document[0].getElementsByClassName('modal-backdrop')).remove();
+            });
+			
+	
+        });
+    };
 }]);
+
+CalendarApp.controller('ModalController', function($scope,eventDayObj, close) {
+	$scope.currentEvents = eventDayObj.events;
+
+	$scope.close = function() {
+		close(eventDayObj);
+	};
+
+	$scope.addEvent = function(){
+		$scope.currentEvents.push(new Event());
+	}
+
+	$scope.updateEventDayObj = function(){
+		//TODO
+	}
+});

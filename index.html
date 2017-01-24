@@ -1,22 +1,28 @@
-<script type="text/javascript" src='./lib/angular/angular.min.js'></script>
-<script type="text/javascript" src='./lib/angular/ui-bootstrap-tpls-0.2.0.js'></script>
-<script type="text/javascript" src='./src/configs/constant.js'></script>
-<script>
- var CalendarApp = angular.module("CalendarApp", [
-    	'ui.bootstrap',
-]);
-
-</script>
-<script type="text/javascript" src='./src/services/dataService.js'></script>
-<script type="text/javascript" src='./src/services/calendarService.js'></script>
-<script type="text/javascript" src='./src/controllers/calendarController.js'></script>
-
 <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/components-md.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/style.css" />
 <link rel="stylesheet" type="text/css" href="./css/layout.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/custom.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/site.css" />
+
+<script type="text/javascript" src='./lib/jquery.min.js'></script>
+<script type="text/javascript" src='./lib/bootstrap.min.js'></script>
+<script type="text/javascript" src='./lib/angular/angular.min.js'></script>
+<script type="text/javascript" src='./lib/angular/ui-bootstrap-tpls-2.4.0.min.js'></script>
+<script type="text/javascript" src='./lib/angular/angular-modal-service.min.js'></script>
+
+<script>
+ var CalendarApp = angular.module("CalendarApp", [
+			'angularModalService',
+]);
+</script>
+
+<script type="text/javascript" src='./src/models/event.js'></script>
+<script type="text/javascript" src='./src/configs/constant.js'></script>
+<script type="text/javascript" src='./src/services/dataService.js'></script>
+<script type="text/javascript" src='./src/services/calendarService.js'></script>
+<script type="text/javascript" src='./src/controllers/calendarController.js'></script>
+
 
 <div ng-app="CalendarApp" ng-controller="CalendarContorller">
 
@@ -88,7 +94,7 @@
 
 													<tr ng-repeat='row in events'>
 													
-														<td class='cal_item' ng-repeat='dayEventObj in row'>
+														<td class='cal_item' ng-repeat='dayEventObj in row' ng-click='showDetail(dayEventObj)'> 
 															<div ng-if='dayEventObj.valid'>
 																<b>{{printDay(dayEventObj.timestamp)}}</b>
 																
@@ -112,16 +118,11 @@
 			</div>
 		</div>
 	</div>
-</div>
-
-
-
-<br />
-
 
 
 <!-- Leave Detail modal -->
-  <div class="modal" id="calenderDetailModal" style='width: 65%; left: 39%;'>
+<script type="text/ng-template" id="calenderDetailModal.html">
+  <div class="modal fade" id="calenderDetailModal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -134,13 +135,22 @@
           
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn default" data-dismiss='modal'>Cancel</button>
-          <button type="button" class="btn blue" ng-click='btnSaveTempRecords()'>Save Events</button>
+          <button type="button" class="btn default" ng-click='close()'>Cancel</button>
+          <button type="button" class="btn blue" ng-click='updateEventDayObj()'>Save Events</button>
         </div>
       </div>
     </div>
   </div>
+</div>
+</script>
 <!-- End Leave Detail modal -->
+
+
+</div>
+
+
+
+
 
 <!-- block modal -->
   <div class="modal" id="blockModal">

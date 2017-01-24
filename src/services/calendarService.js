@@ -18,9 +18,12 @@ CalendarApp.service('CalendarService', function($http) {
 	
 		var dayEventObjs = initTimestampObjs(startTimestamp, endTimestamp, monthStart, monthEnd);
 		angular.forEach(events, function(event){
+			var eventObj = new Event();
+			eventObj.processJSON(event);
+
 			var eventTimestamp = parseDate(event.date).getTime();
 			if(eventTimestamp >= startTimestamp && eventTimestamp <= endTimestamp){
-				dayEventObjs[eventTimestamp].events.push(event);
+				dayEventObjs[eventTimestamp].events.push(eventObj);
 			}
 		});
 		
@@ -40,7 +43,6 @@ CalendarApp.service('CalendarService', function($http) {
 			}
 		});
 		
-console.log(targetEvents);
 		return targetEvents;
 	}
 	
