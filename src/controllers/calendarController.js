@@ -68,7 +68,7 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 			scope: $scope
         }).then(function(modal) {
 			
-            modal.element.modal();
+            modal.element.modal({backdrop: 'static'});
 			
             modal.close.then(function(eventDayObj) {
                 console.log(eventDayObj)
@@ -78,10 +78,16 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 	
         });
     };
+
+	
+	$scope.formatDate = function(timestamp){
+		return CalendarService.formatDate(timestamp);
+	}
 }]);
 
 CalendarApp.controller('ModalController', function($scope,eventDayObj, close) {
 	$scope.currentEvents = eventDayObj.events;
+	$scope.eventDayObj = eventDayObj;
 
 	$scope.close = function() {
 		close(eventDayObj);

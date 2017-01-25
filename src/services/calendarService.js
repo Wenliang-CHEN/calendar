@@ -88,6 +88,13 @@ CalendarApp.service('CalendarService', function($http) {
 		
 		return months[month];
 	}
+
+	//date format to be 'yyyy-dd-mm'
+	this.formatDate = function(timestamp){
+		var date = new Date(parseInt(timestamp));
+
+		return date.getFullYear() + '-' + this.formatToTwoDigits(date.getMonth()+1) + '-' + this.formatToTwoDigits(date.getDate());
+	}
 	
 	//in scope functions
 	function formatToTwoDigits(num){

@@ -22,4 +22,8 @@ function Event () {
 
         return (Object.keys(error).length == 0);
     }
+
+    this.getEventTypeText = function(){
+        return this.type == 0? 'Normal':'Urgent'
+    }
 }
