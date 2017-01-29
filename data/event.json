@@ -8,7 +8,7 @@
 		{"name": "Feb Event 3", "date":"2017-02-08", "remarks":"Feb Remark 2", "type":"0"},
 		{"name": "March Event 1", "date":"2017-03-13", "remarks":"March Remark 1", "type":"0"},
 		{"name": "March Event 2", "date":"2017-03-08", "remarks":"March Remark 2", "type":"0"},
-		{"name": "March Event 3", "date":"2017-03-15", "remarks":"March Remark 3", "type":"2"},
+		{"name": "March Event 3", "date":"2017-03-15", "remarks":"March Remark 3", "type":"1"},
 		{"name": "April Event 1", "date":"2017-04-05", "remarks":"April Remark 1", "type":"0"},
 		{"name": "April Event 2", "date":"2017-04-06", "remarks":"April Remark 2", "type":"0"},
 		{"name": "April Event 3", "date":"2017-04-12", "remarks":"April Remark 3", "type":"1"},

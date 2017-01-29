@@ -83,21 +83,45 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 	$scope.formatDate = function(timestamp){
 		return CalendarService.formatDate(timestamp);
 	}
+
+	//this is a very strict function to determine if an obj is a "empty" object
+	$scope.isEmpty = function(obj){
+		return (typeof obj == 'undefined' || obj == null
+			|| JSON.stringify(obj) === JSON.stringify({}) || obj.length <= 0);
+	}
 }]);
 
 CalendarApp.controller('ModalController', function($scope,eventDayObj, close) {
-	$scope.currentEvents = eventDayObj.events;
+	//For Current Event, we must push the elements one by one again so that the array does not pass by reference
+	$scope.currentEvents = [];
+	angular.forEach(eventDayObj.events, function(event){
+		$scope.currentEvents.push(event.clone());
+	})
+
 	$scope.eventDayObj = eventDayObj;
 
 	$scope.close = function() {
 		close(eventDayObj);
 	};
 
-	$scope.addEvent = function(){
+	$scope.addNewEvent = function(){
 		$scope.currentEvents.push(new Event());
 	}
 
 	$scope.updateEventDayObj = function(){
-		//TODO
+		var allEventsValid = true;
+
+		angular.forEach($scope.currentEvents, function(event){
+			if(allEventsValid && !event.validate()){
+				allEventsValid = false;
+			}
+		});
+
+		if(allEventsValid){
+			eventDayObj.events = $scope.currentEvents;
+			close(eventDayObj);
+		}
 	}
+
+	//TODO: toast, after save, modal scroll
 });
