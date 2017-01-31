@@ -1,9 +1,8 @@
 <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/components-md.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/style.css" />
-<link rel="stylesheet" type="text/css" href="./css/layout.min.css" />
-<link rel="stylesheet" type="text/css" href="./css/custom.min.css" />
-<link rel="stylesheet" type="text/css" href="./css/site.css" />
+<link rel="stylesheet" type="text/css" href="./css/angular-toastr.min.css" />
+<link rel="stylesheet" type="text/css" href="./css/font-awesome.min.css" />
 
 <script type="text/javascript" src='./lib/jquery.min.js'></script>
 <script type="text/javascript" src='./lib/bootstrap.min.js'></script>
@@ -11,10 +10,26 @@
 <script type="text/javascript" src='./lib/angular/ui-bootstrap-tpls-2.4.0.min.js'></script>
 <script type="text/javascript" src='./lib/angular/angular-modal-service.min.js'></script>
 
+
+<script type="text/javascript" src='./lib/angular/angular-animate.js'></script>
+<script type="text/javascript" src='./lib/angular/angular-sanitize.min.js'></script>
+<script type="text/javascript" src='./lib/angular/angular-toastr.tpls.min.js'></script>
+
 <script>
 	var CalendarApp = angular.module("CalendarApp", [
+		'toastr',
 		'angularModalService',
 	]);
+
+	CalendarApp.config(function(toastrConfig) {
+		angular.extend(toastrConfig, {
+			containerId: 'toast-container',
+			maxOpened: 0,    
+			newestOnTop: true,
+			positionClass: 'toast-top-center',
+			target: 'body'
+		});
+	});
 </script>
 
 <script type="text/javascript" src='./src/models/event.js'></script>
@@ -25,7 +40,6 @@
 
 
 <div ng-app="CalendarApp" ng-controller="CalendarContorller">
-
 	<div class="page-container">
 		<div class='page-content'>
 			<div class='container-fluid'>
@@ -36,88 +50,83 @@
 								<div class="portlet-body form">
 									<div class="form-body">
 										<h2 style="margin-left: 20px">Event Calendar</h2>
+											<div class='col-sm-4'>
+												<form class="form-bordered form-horizontal">
+													<div class="form-group">
+														<label class="col-sm-4 control-label">Year </label>
 
-<div class='col-sm-4'>
-	<form class="form-bordered form-horizontal">
-		<div class="form-group">
-			<label class="col-sm-4 control-label">Year </label>
+														<div class="col-sm-8">
+															<select ng-change='onParamChange()' class="form-control" ng-model='year' ng-options='item for item in yearList'></select>
+														</div>
+													</div>
 
-			<div class="col-sm-8">
-				<select ng-change='onParamChange()' class="form-control" ng-model='year' ng-options='item for item in yearList'></select>
+													<div class="form-group">
+														<label class="col-sm-4 control-label">Month </label>
+
+														<div class="col-sm-8">
+															<select ng-change='onParamChange()' class="form-control" ng-model='month' ng-options='item for item in monthList'></select>
+														</div>
+													</div>
+												</form>
+											</div>
+
+											<div class='col-sm-4'></div>
+
+											<div class='col-sm-4'>
+												<table class="table table-bordered pull-right center-table">
+													<thead>
+														<tr>
+															<th colspan="2">Color Scheme</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<th>Priority</th>
+															<td class="red">Red</td>
+														</tr>
+														<tr>
+															<th>Normal</th>
+															<td class="blue">Blue</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+
+											<div class='col-sm-12'>
+												<div class="leave_content">
+													<table class="table table-bordered">
+														<thead>
+															<tr>
+																<th colspan="7" style="text-align: center;">{{year}} - {{getMonthDisplay(month)}}</th>
+															</tr>
+															<tr>
+																<th style="width:14.2%" ng-repeat='columnName in calendarColumns'>{{columnName}}</th>
+															</tr>
+													</thead>
+													<tbody>
+														<tr ng-repeat='row in events'>
+															<td class='cal_item' ng-repeat='dayEventObj in row' ng-click='showDetail(dayEventObj)'>
+																<div ng-if='dayEventObj.valid'>
+																		<b>{{printDay(dayEventObj.timestamp)}}</b>
+																		<div style="width:100%;">
+																			<span ng-repeat='event in dayEventObj.events' class='{{event.getColorClassByType()}}'>{{event.name}}<br/></span>
+																		</div>
+																	</div>
+																</td>
+															</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
-
-		<div class="form-group">
-			<label class="col-sm-4 control-label">Month </label>
-
-			<div class="col-sm-8">
-				<select ng-change='onParamChange()' class="form-control" ng-model='month' ng-options='item for item in monthList'></select>
-			</div>
-		</div>
-	</form>
-</div>
-
-<div class='col-sm-4'></div>
-
-<div class='col-sm-4'>
-	<table class="table table-bordered pull-right scheme_table">
-		<thead>
-			<tr>
-				<th colspan="2">Color Scheme</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<th>Priority</th>
-				<td class="red">Red</td>
-			</tr>
-			<tr>
-				<th>Normal</th>
-				<td class="blue">Blue</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-
-<div class='col-sm-12'>
-	<div class="leave_content">
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th colspan="7" style="text-align: center;">{{year}} - {{getMonthDisplay(month)}}</th>
-</tr>
-<tr>
-	<th style="width:14.2%" ng-repeat='columnName in calendarColumns'>{{columnName}}</th>
-</tr>
-</thead>
-<tbody>
-
-	<tr ng-repeat='row in events'>
-
-		<td class='cal_item' ng-repeat='dayEventObj in row' ng-click='showDetail(dayEventObj)'>
-			<div ng-if='dayEventObj.valid'>
-				<b>{{printDay(dayEventObj.timestamp)}}</b>
-
-				<div style="width:100%;">
-<span ng-repeat='event in dayEventObj.events'>{{event.name}}</span>
-</div>
-
-</div>
-</td>
-
-</tr>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+	</div>
 
 
 <!-- Leave Detail modal -->
@@ -126,25 +135,47 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          	<a class="close" data-dismiss="modal">&times;</a>
 			<h3>
 				Event Detail for {{formatDate(eventDayObj.timestamp)}}
+
+				<button type="button" class="btn green pull-right" ng-click='addNewEvent()'>Add Event</button>
 			</h3>
         </div>
         <div class="modal-body leaveDetailContainer">
-        	<table class="table table-bordered">
+        	<table class="table table-bordered center-table">
 						<thead>
 							<tr>
 								<th>Event</th>	
 								<th>Type</th>
 								<th>Remarks</th>
+								<th></th>
 							<tr>
 						</thead>
 						<tbody>														
 							<tr ng-repeat='event in currentEvents'>
-								<td>{{event.name}}</td>
-								<td>{{event.getEventTypeText()}}</td>
-								<td>{{event.remarks}}</td>
+								<td>
+									<input type='text' ng-model='event.name' class='form-control'/>
+									<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.name)' class="help-block red">
+										{{event.errors.name}}
+									</span>
+								</td>
+								<td>
+									<select class="form-control" ng-model='event.type'>
+										<option value=''>-</option>
+										<option value='0'>Normal</option>
+										<option value='1'>Urgent</option>
+									</select>
+									<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.type)' class="help-block red">
+										{{event.errors.type}}
+									</span>
+								</td>
+								<td><textarea type='text' ng-model='event.remarks' class='form-control' rows='3'/></td>
+								<td>
+									<div class="btn btn-small btn-danger" ng-click='removeEvent($index)'><i class="icon-white icon-large fa fa-remove"></i></div>
+								</td>
+							</tr>
+							<tr class='empty' ng-if='currentEvents.length == 0'>
+								<td colspan='4'>No Event for current date</td>
 							</tr>
 						</tbody>
 					</table>
