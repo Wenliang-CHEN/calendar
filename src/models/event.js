@@ -43,13 +43,4 @@ function Event () {
 
         return color;
     }
-
-    this.clone = function(){
-        var newInstance = new Event();
-        newInstance.name = this.name;
-        newInstance.remarks = this.remarks;
-        newInstance.type = this.type;
-
-        return newInstance;
-    }
 }

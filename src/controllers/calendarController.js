@@ -1,6 +1,6 @@
 
-CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'DataService', 'CalendarService', 'ModalService',
-	function ($scope, $http, $document, DataService, CalendarService, ModalService) {
+CalendarApp.controller("CalendarContorller", ['toastr','$scope', '$http', '$document', 'DataService', 'CalendarService', 'ModalService',
+	function (toastr, $scope, $http, $document, DataService, CalendarService, ModalService) {
 	//Init
 	$scope.yearList = [];
 	$scope.monthList = [];
@@ -12,6 +12,8 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 	$scope.calendarColumns = CalendarService.getColumns();
 	$scope.calendarStarted = false;
 	
+	var yearMonthKey = '';
+
 	var date = new Date();
 	$scope.year = date.getFullYear().toString();
 	$scope.month = CalendarService.formatMonthToString(date.getMonth());
@@ -22,11 +24,21 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 	});
 	
 	$scope.refreshCalendar = function(){
+		yearMonthKey = $scope.year + '_' + $scope.month;
 		$scope.calendarStarted = false;
 	
-		DataService.getEventList().success(function(data){
-			$scope.events = CalendarService.reorganizeEvent($scope.year, $scope.month, data.events);
-		});
+		//var savedEvents = JSON.parse(localStorage.getItem(yearMonthKey));
+
+		//if(isEmpty(savedEvents)){
+			DataService.getEventList().success(function(data){
+				savedEvents = CalendarService.reorganizeEvent($scope.year, $scope.month, data.events);
+
+				$scope.events = savedEvents;
+				//localStorage.setItem(yearMonthKey, JSON.stringify(savedEvents));
+			});
+		//} else {
+		//	$scope.events = CalendarService.reorganizeEvent($scope.year, $scope.month, savedEvents);
+		//}
 	};
 	$scope.refreshCalendar();
 
@@ -64,6 +76,8 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
             controller: "ModalController",
 			inputs: {
 				eventDayObj: eventDayObj,
+				toastr: toastr,
+				yearMonthKey: yearMonthKey
 			},
 			scope: $scope
         }).then(function(modal) {
@@ -71,11 +85,8 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
             modal.element.modal({backdrop: 'static'});
 			
             modal.close.then(function(eventDayObj) {
-                console.log(eventDayObj)
 				angular.element($document[0].getElementsByClassName('modal-backdrop')).remove();
             });
-			
-	
         });
     };
 
@@ -84,18 +95,25 @@ CalendarApp.controller("CalendarContorller", ['$scope', '$http', '$document', 'D
 		return CalendarService.formatDate(timestamp);
 	}
 
-	//this is a very strict function to determine if an obj is a "empty" object
+	//expose the function outside
 	$scope.isEmpty = function(obj){
+		return isEmpty(obj)
+	}
+
+	//this is a very strict function to determine if an obj is a "empty" object
+	function isEmpty(obj){
 		return (typeof obj == 'undefined' || obj == null
 			|| JSON.stringify(obj) === JSON.stringify({}) || obj.length <= 0);
 	}
 }]);
 
-CalendarApp.controller('ModalController', function($scope,eventDayObj, close) {
+CalendarApp.controller('ModalController', function($scope, eventDayObj, close, toastr, yearMonthKey) {
 	//For Current Event, we must push the elements one by one again so that the array does not pass by reference
 	$scope.currentEvents = [];
 	angular.forEach(eventDayObj.events, function(event){
-		$scope.currentEvents.push(event.clone());
+		var newEvent = new Event();
+		newEvent.processJSON(event);
+		$scope.currentEvents.push(newEvent);
 	})
 
 	$scope.eventDayObj = eventDayObj;
@@ -119,8 +137,17 @@ CalendarApp.controller('ModalController', function($scope,eventDayObj, close) {
 
 		if(allEventsValid){
 			eventDayObj.events = $scope.currentEvents;
+
+			//save to localStorage
+			//localStorage.setItem(yearMonthKey, JSON.stringify($scope.events));
+
+			toastr.success('Events updated!');
 			close(eventDayObj);
 		}
+	}
+
+	$scope.removeEvent = function(index){
+		$scope.currentEvents.splice(index, 1);
 	}
 
 	//TODO: toast, after save, modal scroll
