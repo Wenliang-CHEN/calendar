@@ -2,8 +2,13 @@
 
 A calendar view using pure HTML + Angularjs
 
-The initial commit allow users to view the event.
+It allows you to view and update / create events.
+ 
+You can just download the code and run it on any express servers.
+ 
+Event are saved into localstorage.  Perpetuate until you clean the brower cache.
 
-data is mockups.  User can select different month to see the events.
-
-Next step, I will create functions for user to add events into the calendar.
+TODOs:
+- Optimize Code struture
+- Optimize data processing, there are parts that are combersome
+- Simple documentation about code structure
