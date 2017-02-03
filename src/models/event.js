@@ -24,8 +24,6 @@ function Event () {
             this.errors.type = 'Type of the event cannot be blank.';
         }
 
-        console.log(this.errors);
-
         return (Object.keys(this.errors).length == 0);
     }
 

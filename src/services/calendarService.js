@@ -16,36 +16,58 @@ CalendarApp.service('CalendarService', function($http) {
 			endTimestamp += MILLISECONDS_PER_DAY;
 		}
 	
-		var dayEventObjs = initTimestampObjs(startTimestamp, endTimestamp, monthStart, monthEnd);
+		var dailyEventObjs = initTimestampObjs(startTimestamp, endTimestamp, monthStart, monthEnd);
 		angular.forEach(events, function(event){
 			var eventObj = new Event();
 			eventObj.processJSON(event);
 
 			var eventTimestamp = parseDate(event.date).getTime();
 			if(eventTimestamp >= startTimestamp && eventTimestamp <= endTimestamp){
-				dayEventObjs[eventTimestamp].events.push(eventObj);
+				dailyEventObjs[eventTimestamp].events.push(eventObj);
 			}
 		});
 		
 		//after initaition, need to sort the events into serveal 7-element arrays
-		var targetEvents = [];
+		var monthlyEventObjs = [];
 		var rowIndex = 0;
 		var dayIndex = 0;
-		angular.forEach(dayEventObjs, function(dayEventObj){
-			if(typeof targetEvents[rowIndex] == 'undefined'){
-				targetEvents[rowIndex] = [];
+		angular.forEach(dailyEventObjs, function(dayEventObj){
+			if(typeof monthlyEventObjs[rowIndex] == 'undefined'){
+				monthlyEventObjs[rowIndex] = [];
 			}
 			
-			targetEvents[rowIndex].push(dayEventObj);
+			monthlyEventObjs[rowIndex].push(dayEventObj);
 			dayIndex += 1;
 			if(dayIndex > 0 && dayIndex%7==0){
 				rowIndex += 1;
 			}
 		});
 		
-		return targetEvents;
+		return monthlyEventObjs;
 	}
 	
+	this.processEventJSON = function(monthlyEventJson){
+
+		angular.forEach(monthlyEventJson, function(weeklyEventJson, rowIndex){
+			var weeklyEventObj = [];
+
+			angular.forEach(weeklyEventJson, function(dailyEventJson){
+				var events = [];
+
+				angular.forEach(dailyEventJson.events, function(eventJson){
+					var event = new Event();
+					event.processJSON(eventJson);
+					events.push(event);
+				});
+
+				dailyEventJson.events = events;
+			});
+
+		});
+
+		return monthlyEventJson;
+	}
+
 	this.formatMonthToString = function(month){
 		return formatToTwoDigits(month+1);
 	}

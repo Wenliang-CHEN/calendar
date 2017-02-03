@@ -27,18 +27,19 @@ CalendarApp.controller("CalendarContorller", ['toastr','$scope', '$http', '$docu
 		yearMonthKey = $scope.year + '_' + $scope.month;
 		$scope.calendarStarted = false;
 	
-		//var savedEvents = JSON.parse(localStorage.getItem(yearMonthKey));
+		var savedEvents = JSON.parse(localStorage.getItem(yearMonthKey));
 
-		//if(isEmpty(savedEvents)){
+		if(isEmpty(savedEvents)){
 			DataService.getEventList().success(function(data){
 				savedEvents = CalendarService.reorganizeEvent($scope.year, $scope.month, data.events);
 
-				$scope.events = savedEvents;
-				//localStorage.setItem(yearMonthKey, JSON.stringify(savedEvents));
+				//TODO: to loop the events one more time seem not so effective, let see what i could do
+				$scope.events = CalendarService.reorganizeEvent($scope.year, $scope.month, savedEvents);
+				localStorage.setItem(yearMonthKey, JSON.stringify($scope.events));
 			});
-		//} else {
-		//	$scope.events = CalendarService.reorganizeEvent($scope.year, $scope.month, savedEvents);
-		//}
+		} else {
+			$scope.events =  CalendarService.processEventJSON(savedEvents); 
+		}
 	};
 	$scope.refreshCalendar();
 
@@ -70,24 +71,28 @@ CalendarApp.controller("CalendarContorller", ['toastr','$scope', '$http', '$docu
 	}
 
 
-	$scope.showDetail = function(eventDayObj) {
-        ModalService.showModal({
-            templateUrl: 'calenderDetailModal.html',
-            controller: "ModalController",
-			inputs: {
-				eventDayObj: eventDayObj,
-				toastr: toastr,
-				yearMonthKey: yearMonthKey
-			},
-			scope: $scope
-        }).then(function(modal) {
-			
-            modal.element.modal({backdrop: 'static'});
-			
-            modal.close.then(function(eventDayObj) {
-				angular.element($document[0].getElementsByClassName('modal-backdrop')).remove();
-            });
-        });
+	$scope.showDetail = function(dailyEventObj) {
+		if(dailyEventObj.valid){
+			ModalService.showModal({
+				templateUrl: 'calenderDetailModal.html',
+				controller: "ModalController",
+				inputs: {
+					dailyEventObj: dailyEventObj,
+					toastr: toastr,
+					yearMonthKey: yearMonthKey
+				},
+				scope: $scope
+			}).then(function(modal) {
+				
+				modal.element.modal({backdrop: 'static'});
+				
+				modal.close.then(function(dailyEventObj) {
+					angular.element($document[0].getElementsByClassName('modal-backdrop')).remove();
+				});
+			});
+		} else {
+			toastr.warning('Invalid date.');
+		}
     };
 
 	
@@ -107,42 +112,42 @@ CalendarApp.controller("CalendarContorller", ['toastr','$scope', '$http', '$docu
 	}
 }]);
 
-CalendarApp.controller('ModalController', function($scope, eventDayObj, close, toastr, yearMonthKey) {
-	//For Current Event, we must push the elements one by one again so that the array does not pass by reference
+CalendarApp.controller('ModalController', function($scope, dailyEventObj, close, toastr, yearMonthKey) {
+	$scope.dailyEventObj = dailyEventObj;
 	$scope.currentEvents = [];
-	angular.forEach(eventDayObj.events, function(event){
+
+	//For Current Event, we must push the elements one by one again so that the array does not pass by reference
+	angular.forEach(dailyEventObj.events, function(event){
 		var newEvent = new Event();
 		newEvent.processJSON(event);
 		$scope.currentEvents.push(newEvent);
 	})
 
-	$scope.eventDayObj = eventDayObj;
-
 	$scope.close = function() {
-		close(eventDayObj);
+		close(dailyEventObj);
 	};
 
 	$scope.addNewEvent = function(){
 		$scope.currentEvents.push(new Event());
 	}
 
-	$scope.updateEventDayObj = function(){
+	$scope.updatedailyEventObj = function(){
 		var allEventsValid = true;
 
 		angular.forEach($scope.currentEvents, function(event){
-			if(allEventsValid && !event.validate()){
+			if(!event.validate()){
 				allEventsValid = false;
 			}
 		});
 
 		if(allEventsValid){
-			eventDayObj.events = $scope.currentEvents;
+			dailyEventObj.events = $scope.currentEvents;
 
 			//save to localStorage
-			//localStorage.setItem(yearMonthKey, JSON.stringify($scope.events));
+			localStorage.setItem(yearMonthKey, JSON.stringify($scope.events));
 
 			toastr.success('Events updated!');
-			close(eventDayObj);
+			close(dailyEventObj);
 		}
 	}
 

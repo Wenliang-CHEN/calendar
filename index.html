@@ -136,7 +136,7 @@
       <div class="modal-content">
         <div class="modal-header">
 			<h3>
-				Event Detail for {{formatDate(eventDayObj.timestamp)}}
+				Event Detail for {{formatDate(dailyEventObj.timestamp)}}
 
 				<button type="button" class="btn green pull-right" ng-click='addNewEvent()'>Add Event</button>
 			</h3>
@@ -182,7 +182,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn default" ng-click='close()'>Cancel</button>
-          <button type="button" class="btn blue" ng-click='updateEventDayObj()'>Save Events</button>
+          <button type="button" class="btn blue" ng-click='updatedailyEventObj()'>Save Events</button>
         </div>
       </div>
     </div>
