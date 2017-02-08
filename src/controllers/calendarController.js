@@ -31,8 +31,6 @@ CalendarApp.controller("CalendarContorller", ['toastr','$scope', '$http', '$docu
 
 		if(isEmpty(savedEvents)){
 			DataService.getEventList().success(function(data){
-				savedEvents = CalendarService.reorganizeEvent($scope.year, $scope.month, data.events);
-
 				//TODO: to loop the events one more time seem not so effective, let see what i could do
 				$scope.events = CalendarService.reorganizeEvent($scope.year, $scope.month, savedEvents);
 				localStorage.setItem(yearMonthKey, JSON.stringify($scope.events));
