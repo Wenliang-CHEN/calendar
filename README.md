@@ -12,3 +12,4 @@ TODOs:
 - Optimize Code struture
 - Optimize data processing, there are parts that are combersome
 - Simple documentation about code structure
+- Switch storage from localStorage to Indexed DB
