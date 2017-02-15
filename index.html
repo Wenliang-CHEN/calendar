@@ -13,9 +13,11 @@
 
 <script type="text/javascript" src='./lib/angular/angular-sanitize.min.js'></script>
 <script type="text/javascript" src='./lib/angular/angular-toastr.tpls.min.js'></script>
-
+<script type="text/javascript" src='./lib/angular/angular-animate.min.js'></script>
+<!-- TODO: change the modal plugin -->
 <script>
 	var CalendarApp = angular.module("CalendarApp", [
+		'ngAnimate',
 		'toastr',
 		'angularModalService',
 	]);
@@ -130,7 +132,7 @@
 
 <!-- Leave Detail modal -->
 <script type="text/ng-template" id="calenderDetailModal.html">
-  <div class="modal fade" id="calenderDetailModal">
+  <div class="modal" id="calenderDetailModal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
