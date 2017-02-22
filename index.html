@@ -4,21 +4,19 @@
 <link rel="stylesheet" type="text/css" href="./css/angular-toastr.min.css" />
 <link rel="stylesheet" type="text/css" href="./css/font-awesome.min.css" />
 
-<script type="text/javascript" src='./lib/jquery.min.js'></script>
-<script type="text/javascript" src='./lib/bootstrap.min.js'></script>
 <script type="text/javascript" src='./lib/angular/angular.min.js'></script>
 <script type="text/javascript" src='./lib/angular/ui-bootstrap-tpls-2.4.0.min.js'></script>
-<script type="text/javascript" src='./lib/angular/angular-modal-service.min.js'></script>
 
 
-<script type="text/javascript" src='./lib/angular/angular-animate.js'></script>
 <script type="text/javascript" src='./lib/angular/angular-sanitize.min.js'></script>
 <script type="text/javascript" src='./lib/angular/angular-toastr.tpls.min.js'></script>
-
+<script type="text/javascript" src='./lib/angular/angular-animate.min.js'></script>
+<!-- TODO: change the modal plugin -->
 <script>
 	var CalendarApp = angular.module("CalendarApp", [
+		'ngAnimate',
 		'toastr',
-		'angularModalService',
+		'ui.bootstrap',
 	]);
 
 	CalendarApp.config(function(toastrConfig) {
@@ -39,7 +37,7 @@
 <script type="text/javascript" src='./src/controllers/calendarController.js'></script>
 <script type="text/javascript" src='./src/controllers/modalController.js'></script>
 
-<div ng-app="CalendarApp" ng-controller="CalendarContorller">
+<div ng-app="CalendarApp" ng-controller="CalendarContorller as $ctrl">
 	<div class="page-container">
 		<div class='page-content'>
 			<div class='container-fluid'>
@@ -56,7 +54,7 @@
 														<label class="col-sm-4 control-label">Year </label>
 
 														<div class="col-sm-8">
-															<select ng-change='onParamChange()' class="form-control" ng-model='year' ng-options='item for item in yearList'></select>
+															<select ng-change='$ctrl.onParamChange()' class="form-control" ng-model='$ctrl.year' ng-options='item for item in $ctrl.yearList'></select>
 														</div>
 													</div>
 
@@ -64,7 +62,7 @@
 														<label class="col-sm-4 control-label">Month </label>
 
 														<div class="col-sm-8">
-															<select ng-change='onParamChange()' class="form-control" ng-model='month' ng-options='item for item in monthList'></select>
+															<select ng-change='$ctrl.onParamChange()' class="form-control" ng-model='$ctrl.month' ng-options='item for item in $ctrl.monthList'></select>
 														</div>
 													</div>
 												</form>
@@ -97,17 +95,17 @@
 													<table class="table table-bordered">
 														<thead>
 															<tr>
-																<th colspan="7" style="text-align: center;">{{year}} - {{getMonthDisplay(month)}}</th>
+																<th colspan="7" style="text-align: center;">{{$ctrl.year}} - {{$ctrl.getMonthDisplay($ctrl.month)}}</th>
 															</tr>
 															<tr>
-																<th style="width:14.2%" ng-repeat='columnName in calendarColumns'>{{columnName}}</th>
+																<th style="width:14.2%" ng-repeat='columnName in $ctrl.calendarColumns'>{{columnName}}</th>
 															</tr>
 													</thead>
 													<tbody>
-														<tr ng-repeat='row in events'>
-															<td class='cal_item' ng-repeat='dayEventObj in row' ng-click='showDetail(dayEventObj)'>
+														<tr ng-repeat='row in $ctrl.events'>
+															<td class='cal_item' ng-repeat='dayEventObj in row' ng-click='$ctrl.showDetail(dayEventObj)'>
 																<div ng-if='dayEventObj.valid'>
-																		<b>{{printDay(dayEventObj.timestamp)}}</b>
+																		<b>{{$ctrl.printDay(dayEventObj.timestamp)}}</b>
 																		<div style="width:100%;">
 																			<span ng-repeat='event in dayEventObj.events' class='{{event.getColorClassByType()}}'>{{event.name}}<br/></span>
 																		</div>
@@ -130,65 +128,59 @@
 
 
 <!-- Leave Detail modal -->
-<script type="text/ng-template" id="calenderDetailModal.html">
-  <div class="modal fade" id="calenderDetailModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-			<h3>
-				Event Detail for {{formatDate(dailyEventObj.timestamp)}}
+	<script type="text/ng-template" id="calenderDetailModal.html">
+			<div class="modal-header">
+				<h3>
+					Event Detail for {{$ctrl.formatDate(dailyEventObj.timestamp)}}
 
-				<button type="button" class="btn green pull-right" ng-click='addNewEvent()'>Add Event</button>
-			</h3>
-        </div>
-        <div class="modal-body leaveDetailContainer">
-        	<table class="table table-bordered center-table">
-						<thead>
-							<tr>
-								<th>Event</th>	
-								<th>Type</th>
-								<th>Remarks</th>
-								<th></th>
-							<tr>
-						</thead>
-						<tbody>														
-							<tr ng-repeat='event in currentEvents'>
-								<td>
-									<input type='text' ng-model='event.name' class='form-control'/>
-									<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.name)' class="help-block red">
-										{{event.errors.name}}
-									</span>
-								</td>
-								<td>
-									<select class="form-control" ng-model='event.type'>
-										<option value=''>-</option>
-										<option value='0'>Normal</option>
-										<option value='1'>Urgent</option>
-									</select>
-									<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.type)' class="help-block red">
-										{{event.errors.type}}
-									</span>
-								</td>
-								<td><textarea type='text' ng-model='event.remarks' class='form-control' rows='3'/></td>
-								<td>
-									<div class="btn btn-small btn-danger" ng-click='removeEvent($index)'><i class="icon-white icon-large fa fa-remove"></i></div>
-								</td>
-							</tr>
-							<tr class='empty' ng-if='currentEvents.length == 0'>
-								<td colspan='4'>No Event for current date</td>
-							</tr>
-						</tbody>
-					</table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn default" ng-click='close()'>Cancel</button>
-          <button type="button" class="btn blue" ng-click='updatedailyEventObj()'>Save Events</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</script>
+					<button type="button" class="btn green pull-right" ng-click='$ctrl.addNewEvent()'>Add Event</button>
+				</h3>
+			</div>
+			<div class="modal-body leaveDetailContainer">
+				<table class="table table-bordered center-table">
+							<thead>
+								<tr>
+									<th>Event</th>	
+									<th>Type</th>
+									<th>Remarks</th>
+									<th></th>
+								<tr>
+							</thead>
+							<tbody>														
+								<tr ng-repeat='event in $ctrl.currentEvents'>
+									<td>
+										<input type='text' ng-model='event.name' class='form-control'/>
+										<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.name)' class="help-block red">
+											{{event.errors.name}}
+										</span>
+									</td>
+									<td>
+										<select class="form-control" ng-model='event.type'>
+											<option value=''>-</option>
+											<option value='0'>Normal</option>
+											<option value='1'>Urgent</option>
+										</select>
+										<span ng-if='!isEmpty(event.errors) && !isEmpty(event.errors.type)' class="help-block red">
+											{{event.errors.type}}
+										</span>
+									</td>
+									<td><textarea type='text' ng-model='event.remarks' class='form-control' rows='3'/></td>
+									<td>
+										<div class="btn btn-small btn-danger" ng-click='$ctrl.removeEvent($index)'><i class="icon-white icon-large fa fa-remove"></i></div>
+									</td>
+								</tr>
+								<tr class='empty' ng-if='$ctrl.currentEvents.length == 0'>
+									<td colspan='4'>No Event for current date</td>
+								</tr>
+							</tbody>
+						</table>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn default" ng-click='$ctrl.close()'>Cancel</button>
+			<button type="button" class="btn blue" ng-click='$ctrl.updatedailyEventObj()'>Save Events</button>
+			</div>
+		</div>
+	</script>
 <!-- End Leave Detail modal -->
 
 

@@ -2,7 +2,7 @@ CalendarApp.service('CalendarService', function($http) {
 	this.reorganizeEvent = function(year, month, events){
 		var monthStart = getFirstDateOfMonth(year, month).getTime();
 		var startTimestamp = monthStart;
-		
+
 		//if the 1st day is not SUN, revert until sun to hit the 1st of the calendar
 		while(new Date(parseInt(startTimestamp)).getDay() != DAY_OF_WEEK_SUN){
 			startTimestamp -= MILLISECONDS_PER_DAY;
