@@ -30,21 +30,18 @@ CalendarApp.controller("CalendarContorller", ['$uibModal','toastr','$scope', '$h
 		yearMonthKey = $ctrl.year + '_' + $ctrl.month;
 		$ctrl.calendarStarted = false;
 	
-		var savedEvents =localStorage.getItem(yearMonthKey);
-
-//TODO: now the events are blank
-		//if(isEmpty(savedEvents)){
+		var savedEvents = localStorage.getItem(yearMonthKey);
+		
+		if(isEmpty(savedEvents)){
 			DataService.getEventList().success(function(data){
 				//TODO: to loop the events one more time seem not so effective, let see what i could do
-				$ctrl.events = CalendarService.reorganizeEvent($ctrl.year, $ctrl.month, data);
-
-				console.log(data);
+				$ctrl.events = CalendarService.reorganizeEvent($ctrl.year, $ctrl.month, data.events);
 				localStorage.setItem(yearMonthKey, JSON.stringify($ctrl.events));
 			});
-		//} else {
-	//		savedEvents = JSON.parse(savedEvents);
-	//		$ctrl.events =  CalendarService.processEventJSON(savedEvents); 
-	//	}
+		} else {
+			savedEvents = JSON.parse(savedEvents);
+			$ctrl.events =  CalendarService.processEventJSON(savedEvents); 
+		}
 	};
 	$ctrl.refreshCalendar();
 
@@ -85,20 +82,23 @@ CalendarApp.controller("CalendarContorller", ['$uibModal','toastr','$scope', '$h
       templateUrl: 'calenderDetailModal.html',
       controller: 'ModalController',
       controllerAs: '$ctrl',
-	  size: 'lg',
+	  	size: 'lg',
       resolve: {
         dailyEventObj: function () {
           return dailyEventObj;
         },
-		yearMonthKey: function () {
+				yearMonthKey: function () {
           return yearMonthKey;
         }
       }
     });
 
+		//when the modal signals process done: give the user a success toast 
     modalInstance.result.then(function (returnedDailyEventObj) {
-    }, function () {
-      toastr.success('Events updated!');
+			
+			//save to localStorage
+			localStorage.setItem(yearMonthKey, JSON.stringify($ctrl.events));
+			toastr.success('Events updated!');
     });
   };
 	

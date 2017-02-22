@@ -12,6 +12,7 @@ CalendarApp.controller('ModalController', function($uibModalInstance, dailyEvent
 	})
 
 	$ctrl.close = function() {
+		$uibModalInstance.dismiss('cancel');
 	};
 
 	$ctrl.addNewEvent = function(){
@@ -29,9 +30,6 @@ CalendarApp.controller('ModalController', function($uibModalInstance, dailyEvent
 
 		if(allEventsValid){
 			dailyEventObj.events = $ctrl.currentEvents;
-
-			//save to localStorage
-			localStorage.setItem(yearMonthKey, JSON.stringify($ctrl.events));
 			$uibModalInstance.close(dailyEventObj);
 		}
 	}
