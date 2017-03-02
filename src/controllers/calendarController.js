@@ -34,7 +34,7 @@ CalendarApp.controller("CalendarContorller", ['$uibModal','toastr','$scope', '$h
 		
 		if(isEmpty(savedEvents)){
 			DataService.getEventList().success(function(data){
-				//TODO: to loop the events one more time seem not so effective, let see what i could do
+
 				$ctrl.events = CalendarService.reorganizeEvent($ctrl.year, $ctrl.month, data.events);
 				localStorage.setItem(yearMonthKey, JSON.stringify($ctrl.events));
 			});

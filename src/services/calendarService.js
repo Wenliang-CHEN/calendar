@@ -11,11 +11,12 @@ CalendarApp.service('CalendarService', function($http) {
 		var monthEnd = getLastDateOfMonth(year, month).getTime();
 		var endTimestamp = monthEnd;
 		
-		//same way for ending
+		//same way for ending: if the last day is not SAT, push it to SAT
 		while(new Date(parseInt(endTimestamp)).getDay() != DAY_OF_WEEK_SAT){
 			endTimestamp += MILLISECONDS_PER_DAY;
 		}
 	
+		//after initiate, all the dailyEventObjs are objs with timestamp and empty event list
 		var dailyEventObjs = initTimestampObjs(startTimestamp, endTimestamp, monthStart, monthEnd);
 		angular.forEach(events, function(event){
 			var eventObj = new Event();
@@ -27,7 +28,7 @@ CalendarApp.service('CalendarService', function($http) {
 			}
 		});
 		
-		//after initaition, need to sort the events into serveal 7-element arrays
+		//until here, each dailyEventObjs will have a list of events
 		var monthlyEventObjs = [];
 		var rowIndex = 0;
 		var dayIndex = 0;
